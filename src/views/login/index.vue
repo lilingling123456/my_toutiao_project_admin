@@ -22,7 +22,9 @@
           >
         </el-form-item>
         <el-form-item>
-          <el-button class="login-btn" type="primary" @click="onLogin"
+          <el-button class="login-btn" type="primary"
+          :loading="loginLoading"
+          @click="onLogin"
             >登录</el-button
           >
         </el-form-item>
@@ -43,7 +45,8 @@ export default {
         mobile: '', // 手机号
         code: '' // 验证码
       },
-      checked: false // 是否同意协议的选中状态
+      checked: false, // 是否同意协议的选中状态
+      loginLoading: false
     }
   },
   computed: {},
@@ -56,7 +59,8 @@ export default {
       const user = this.user
 
       // 表单验证
-
+      // 开启loading
+      this.loginLoading = true
       // 验证通过，提交登录
       request({
         method: 'POST',
@@ -71,6 +75,9 @@ export default {
           message: '登录成功',
           type: 'success'
         })
+
+        // 关闭loading
+        this.loginLoading = false
       }).catch(err => {
         console.log('登录失败', err)
         // 登录失败
