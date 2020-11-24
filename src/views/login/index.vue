@@ -34,7 +34,9 @@
 </template>
 
 <script>
-import request from '@/utils/request'
+
+import { login } from '@/api/user'
+
 export default {
   name: 'LoginIndex',
   components: {},
@@ -42,8 +44,8 @@ export default {
   data () {
     return {
       user: {
-        mobile: '', // 手机号
-        code: '', // 验证码
+        mobile: '13711111111', // 手机号
+        code: '246810', // 验证码
         agree: false
       },
       // checked: false, 是否同意协议的选中状态
@@ -51,11 +53,11 @@ export default {
       formRules: { // 表单验证规则配置
         // 要验证的数据名称：规则列表[]
         mobile: [
-          { required: true, message: '请输入手机号', trigger: 'change' },
+          { required: true, message: '请输入手机号', trigger: 'blur' },
           { pattern: /^1[3|5|7|8|9]\d{9}$/, message: '请输入正确的号码格式', trigger: 'change' }
         ],
         code: [
-          { required: true, message: '验证码不能为空', trigger: 'change' },
+          { required: true, message: '验证码不能为空', trigger: 'blur' },
           { pattern: /^\d{6}$/, message: '请输入正确的验证码格式' }
         ],
         agree: [
@@ -71,7 +73,7 @@ export default {
               }
             },
             // message: '请勾选同意用户协议',
-            trigger: 'change'
+            trigger: 'blur'
           }
         ]
       }
@@ -99,18 +101,16 @@ export default {
       // 开启loading
       this.loginLoading = true
       // 验证通过，提交登录
-      request({
-        method: 'POST',
-        url: '/mp/v1_0/authorizations',
-        // data 用来设置 POST 请求体
-        data: this.user
-      }).then(res => {
+      login(this.user).then(res => {
         console.log(res)
 
         // 登录成功
-        this.$message({
-          message: '登录成功',
-          type: 'success'
+        // this.$message({
+        // message: '登录成功',
+        // type: 'success'
+        // })
+        this.$router.push({
+          name: 'home'
         })
 
         // 关闭loading
