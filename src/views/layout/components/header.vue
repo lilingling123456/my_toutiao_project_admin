@@ -6,8 +6,8 @@
     </div>
     <el-dropdown>
       <div class="avatar-wrap">
-        <img class="avatar" src="http://toutiao.meiduo.site/FrvifflobfNNRM9V_ZBTI2ZaTH4n" alt="">
-        <span>用户昵称</span>
+        <img class="avatar" :src="user.photo" alt="">
+        <span>{{user.name}}</span>
         <i class="el-icon-arrow-down el-icon--right"></i>
       </div>
       <el-dropdown-menu slot="dropdown">
@@ -19,18 +19,32 @@
 </template>
 
 <script>
+// http://toutiao-img.itheima.net/FuyELvGh8jbise6bfoEr0W7luPLq
+import { getUserProfile } from '@/api/user'
+
 export default {
   name: 'AppHeader',
   components: {},
   props: {},
   data () {
-    return {}
+    return {
+      user: {}// 显示当前登录的用户
+    }
   },
   computed: {},
   watch: {},
-  created () {},
+  created () {
+    // 组件初始化好，请求获取用户资料
+    this.loadUserProfile()
+  },
   mounted () {},
-  methods: {}
+  methods: {
+    loadUserProfile () {
+      getUserProfile().then(res => {
+        this.user = res.data.data
+      })
+    }
+  }
 }
 </script>
 
