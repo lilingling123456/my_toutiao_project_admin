@@ -45,7 +45,7 @@
 
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        根据筛选条件共查询到 46147 条结果：
+        根据筛选条件共查询到 {{ totalCount}} 条结果：
       </div>
       <!-- 数据列表 -->
       <el-table
@@ -58,6 +58,13 @@
         <el-table-column
             prop="date"
             label="封面">
+            <template slot-scope="scope">
+              <img
+                v-if="scope.row.cover.images[0]"
+                class="article-cover"
+                :src="scope.row.cover.images[0]" alt="">
+              <img v-else class="article-cover" src="./no-cover.gif" alt="">
+            </template>
         </el-table-column>
         <el-table-column
             prop="title"
@@ -99,7 +106,9 @@
       <el-pagination
         layout="prev, pager, next"
         background
-        :total="1000">
+        :total="totalCount"
+        :page-size="pageSize"
+        @current-change="onCurrentChange">
       </el-pagination>
       <!-- /列表分页 -->
     </el-card>
@@ -122,23 +131,34 @@ export default {
         { status: 2, text: '审核通过', type: 'success' }, // 2
         { status: 3, text: '审核失败', type: 'warning' }, // 3
         { status: 4, text: '已删除', type: 'danger' } // 4
-      ]
+      ],
+      totalCount: 0, // 总数据条数
+      pageSize: 10
     }
   },
   computed: {},
   watch: {},
   created () {
-    this.loadArticles()
+    this.loadArticles(1)
   },
   mounted () {},
   methods: {
     onSubmit () {
       console.log('submit!')
     },
-    loadArticles () {
-      getArticles().then(res => {
-        this.articles = res.data.data.results
+    loadArticles (page = 1) {
+      getArticles({
+        page,
+        per_page: this.pageSize
+      }).then(res => {
+        // this.articles = res.data.data.results
+        const { results, total_count: totalCount } = res.data.data
+        this.articles = results
+        this.totalCount = totalCount
       })
+    },
+    onCurrentChange (page) {
+      this.loadArticles(page)
     }
   }
 }
@@ -151,5 +171,10 @@ export default {
 
 .list-table {
   margin-bottom: 20px;
+}
+
+.article-cover {
+    width: 60px;
+    background-size: cover;
 }
 </style>
