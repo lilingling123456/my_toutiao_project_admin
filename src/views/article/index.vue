@@ -12,32 +12,38 @@
       <!-- 数据筛选表单 -->
       <el-form ref="form" :model="form" label-width="40px" size="mini">
         <el-form-item label="状态">
-          <el-radio-group v-model="form.resource">
-            <el-radio label="全部"></el-radio>
-            <el-radio label="草稿"></el-radio>
-            <el-radio label="待审核"></el-radio>
-            <el-radio label="审核通过"></el-radio>
-            <el-radio label="审核失败"></el-radio>
-            <el-radio label="已删除"></el-radio>
+          <el-radio-group v-model="status">
+            <el-radio :label="null">全部</el-radio>
+            <el-radio :label="0">草稿</el-radio>
+            <el-radio :label="1">待审核</el-radio>
+            <el-radio :label="2">审核通过</el-radio>
+            <el-radio :label="3">审核失败</el-radio>
+            <el-radio :label="4">已删除</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="频道">
-          <el-select v-model="form.region" placeholder="请选择频道">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
+          <el-select v-model="channelId" placeholder="请选择频道">
+            <el-option
+              label="channel.name"
+              value="channel.id"
+              v-for="(channels, index) in channels"
+              :key="index"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="日期">
           <el-date-picker
-            v-model="form.date1"
+            v-model="rangeDate"
             type="datetimerange"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
-            :default-time="['12:00:00']">
+            :default-time="['12:00:00']"
+            format="yyyy-MM-dd"
+            value-format="yyyy-MMM-dd"
+            >
           </el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onSubmit">查询</el-button>
+          <el-button type="primary" @click="loadArticles(1)">查询</el-button>
         </el-form-item>
       </el-form>
       <!-- /数据筛选表单 -->
@@ -45,7 +51,7 @@
 
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        根据筛选条件共查询到 {{ totalCount}} 条结果：
+        根据筛选条件共查询到 {{ totalCount }} 条结果：
       </div>
       <!-- 数据列表 -->
       <el-table
@@ -59,11 +65,21 @@
             prop="date"
             label="封面">
             <template slot-scope="scope">
-              <img
+              <el-image
+                style="width: 100px; height: 100px"
+                :src="scope.row.cover.images[0]"
+                fit="cover"
+                lazy
+              >
+                <div slot="placeholder" class="image-slot">
+                    加载中<span class="dot">...</span>
+                </div>
+              </el-image>
+              <!-- <img
                 v-if="scope.row.cover.images[0]"
                 class="article-cover"
                 :src="scope.row.cover.images[0]" alt="">
-              <img v-else class="article-cover" src="./no-cover.gif" alt="">
+              <img v-else class="article-cover" src="" alt=""> ./no-cover.gif -->
             </template>
         </el-table-column>
         <el-table-column
@@ -116,7 +132,8 @@
 </template>
 
 <script>
-import { getArticles } from '@/api/article'
+import { getArticles, getArticleChannels } from '@/api/article'
+
 export default {
   name: 'ArticleIndex',
   components: {},
@@ -133,23 +150,29 @@ export default {
         { status: 4, text: '已删除', type: 'danger' } // 4
       ],
       totalCount: 0, // 总数据条数
-      pageSize: 10
+      pageSize: 10,
+      status: null,
+      channels: [],
+      channelId: null,
+      rangeDate: null,
+      begin_pubdate: this.rangeDate ? this.rangeDate[0] : null,
+      end_pubdate: this.rangeDate ? this.rangeDate[1] : null
     }
   },
   computed: {},
   watch: {},
   created () {
+    this.loadChannels()
     this.loadArticles(1)
   },
   mounted () {},
   methods: {
-    onSubmit () {
-      console.log('submit!')
-    },
     loadArticles (page = 1) {
       getArticles({
         page,
-        per_page: this.pageSize
+        per_page: this.pageSize,
+        status: this.status,
+        channelId: this.channelId
       }).then(res => {
         // this.articles = res.data.data.results
         const { results, total_count: totalCount } = res.data.data
@@ -159,6 +182,11 @@ export default {
     },
     onCurrentChange (page) {
       this.loadArticles(page)
+    },
+    loadChannels () {
+      getArticleChannels().then(res => {
+        this.channels = res.data.data.channels
+      })
     }
   }
 }
