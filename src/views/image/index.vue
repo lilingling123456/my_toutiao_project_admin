@@ -31,12 +31,17 @@
         :xs="12" :sm="6" :md="6" :lg="4"
         v-for="(img, index) in images"
         :key="index"
+        class="image.item"
         >
           <el-image
             style="height: 100px"
             :src="img.url"
             fit="cover"
           ></el-image>
+          <div class="image-action">
+            <i class="el-icon-star-on"></i>
+            <i class="el-icon-delete-solid"></i>
+          </div>
         </el-col>
       </el-row>
       <!-- /素材列表 -->
@@ -106,4 +111,28 @@ export default {
 }
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.action-head {
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.image-item {
+  position: relative;
+}
+
+.image-action {
+  font-size: 25px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  color:#fff;
+  height: 40px;
+  background-color: rgba(204,204,204, .5);
+//   position: absolute;
+  bottom: 4px;
+  left: 5px;
+  right: 5px;
+}
+</style>
