@@ -43,7 +43,11 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="loadArticles(1)">查询</el-button>
+          <el-button
+            type="primary"
+            @click="loadArticles(1)"
+            :disabled="loading"
+          >查询</el-button>
         </el-form-item>
       </el-form>
       <!-- /数据筛选表单 -->
@@ -60,6 +64,7 @@
         style="width: 100%"
         class="list-table"
         size="mini"
+        v-loading="loading"
         >
         <el-table-column
             prop="date"
@@ -112,6 +117,7 @@
                 type="danger"
                 icon="el-icon-delete"
                 circle
+                @click="onDeleteArticle(scope.row.id)"
             ></el-button>
             </template>
         </el-table-column>
@@ -124,6 +130,8 @@
         background
         :total="totalCount"
         :page-size="pageSize"
+        :disabled="loading"
+        :current-page.sync="page"
         @current-change="onCurrentChange">
       </el-pagination>
       <!-- /列表分页 -->
@@ -132,7 +140,7 @@
 </template>
 
 <script>
-import { getArticles, getArticleChannels } from '@/api/article'
+import { getArticles, getArticleChannels, deleteArticle } from '@/api/article'
 
 export default {
   name: 'ArticleIndex',
@@ -156,7 +164,9 @@ export default {
       channelId: null,
       rangeDate: null,
       begin_pubdate: this.rangeDate ? this.rangeDate[0] : null,
-      end_pubdate: this.rangeDate ? this.rangeDate[1] : null
+      end_pubdate: this.rangeDate ? this.rangeDate[1] : null,
+      loading: true,
+      page: 1
     }
   },
   computed: {},
@@ -172,9 +182,11 @@ export default {
         page,
         per_page: this.pageSize,
         status: this.status,
-        channelId: this.channelId
+        channelId: this.channelId,
+        loading: this.loading
       }).then(res => {
         // this.articles = res.data.data.results
+        this.loading = false
         const { results, total_count: totalCount } = res.data.data
         this.articles = results
         this.totalCount = totalCount
@@ -186,6 +198,30 @@ export default {
     loadChannels () {
       getArticleChannels().then(res => {
         this.channels = res.data.data.channels
+      })
+    },
+    onDeleteArticle (articleId) {
+      console.log(articleId)
+      // console.log(articleId.toString())
+      this.$confirm('确认删除吗？', '删除提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // 确认执行这里
+        deleteArticle(articleId).then(res => {
+          console.log(res)
+          this.loadArticles(this.page)
+          // this.$message({
+          //   message: '删除成功',
+          //   type: 'success'
+          // })
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
       })
     }
   }
