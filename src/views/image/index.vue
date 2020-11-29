@@ -46,7 +46,20 @@
       :visible.sync="dialogUploadVisible"
       :append-to-body="true"
     >
-      hello world
+      <el-upload
+        class="upload-demo"
+        drag
+        action="http://ttapi.research.itcast.cn/mp/v1_0/user/images"
+        :headers="uploadHeaders"
+        name="image"
+        multiple
+        :show-file-list="false"
+        :on-success="onUploadSuccess"
+      >
+        <i class="el-icon-upload"></i>
+        <div class="el-upload_text">将文件拖到此处，或<em>点击上传</em></div>
+        <div class="el-upload_tip" slot="tip">智能上传jpg/png文件，且不超过500kb</div>
+      </el-upload>
     </el-dialog>
   </div>
 </template>
@@ -58,10 +71,14 @@ export default {
   components: {},
   props: {},
   data () {
+    const user = JSON.parse(window.localStorage.getItem('user'))
     return {
       collect: false,
       images: [],
-      dialogUploadVisible: false
+      dialogUploadVisible: false,
+      uploadHeaders: {
+        Authorization: `Bearer ${user.token}`
+      }
     }
   },
   computed: {},
@@ -80,6 +97,10 @@ export default {
     },
     onCollectChange (value) {
       this.loadImages(value)
+    },
+    onUploadSuccess () {
+      this.dialogUploadVisible = false
+      this.loadImages(false)
     }
   }
 }
