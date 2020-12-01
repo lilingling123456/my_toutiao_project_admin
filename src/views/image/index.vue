@@ -10,7 +10,7 @@
         <!-- /面包屑路径导航 -->
         <!-- <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button> -->
       </div>
-      <div style="padding-bottom: 20px;">
+      <div class="action-head" style="padding-bottom: 20px;">
         <el-radio-group
         v-model="collect"
         size="mini"
@@ -59,7 +59,7 @@
             <!-- <i class="el-icon-delete-solid"></i> -->
             <el-button
               type="danger"
-              :icon="el-icon-delete-solid"
+              icon="el-icon-delete-solid"
               circle
               size="small"
               @click="onDelete(img)"
@@ -120,14 +120,14 @@ export default {
         Authorization: `Bearer ${user.token}`
       },
       totalCount: 0,
-      pageSize: 20,
+      pageSize: 7,
       page: 1
     }
   },
   computed: {},
   watch: {},
   created () {
-    this.loadImages(false)
+    this.loadImages(1)
   },
   mounted () {},
   methods: {
@@ -193,7 +193,7 @@ export default {
   color:#fff;
   height: 40px;
   background-color: rgba(204,204,204, .5);
-//   position: absolute;
+  // position: absolute;
   bottom: 4px;
   left: 5px;
   right: 5px;

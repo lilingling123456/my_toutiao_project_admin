@@ -24,8 +24,8 @@
         <el-form-item label="频道">
           <el-select v-model="channelId" placeholder="请选择频道">
             <el-option
-              label="channel.name"
-              value="channel.id"
+              :label="channels.name"
+              :value="channels.id"
               v-for="(channels, index) in channels"
               :key="index"></el-option>
           </el-select>
