@@ -31,9 +31,10 @@
           </el-radio-group>
           <template v-if="article.cover.type > 0">
             <upload-cover
-              v-model="article.cover.images[index]"
+              :cover-image.sync="article.cover.images[index]"
               :key="cover"
               v-for="(cover, index) in article.cover.type"
+              @update-cover="onUpdateCover(index,$event)"
             />
           </template>
         </el-form-item>
@@ -57,7 +58,7 @@
 </template>
 
 <script>
-import UploadCover from './components/cover'
+import UploadCover from './components/upload-cover'
 import { getArticleChannels, addArticle, getArticle, updateArticle } from '@/api/article'
 import {
   ElementTiptap,
@@ -175,6 +176,9 @@ export default {
   },
   mounted () {},
   methods: {
+    onUpdateCover (index, url) {
+      this.article.cover.images[index] = url
+    },
     loadArticle () {
       getArticle(this.$route.query.id).then(res => {
         // 模板绑定展示
