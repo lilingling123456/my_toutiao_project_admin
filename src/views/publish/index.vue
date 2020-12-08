@@ -31,7 +31,7 @@
           </el-radio-group>
           <template v-if="article.cover.type > 0">
             <upload-cover
-              :v-model="article.cover.images[index]"
+              v-model="article.cover.images[index]"
               :key="cover"
               v-for="(cover, index) in article.cover.type"
             />
